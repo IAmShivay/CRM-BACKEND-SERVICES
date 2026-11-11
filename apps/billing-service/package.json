@@ -9,7 +9,7 @@
   "dependencies": {
     "express": "^4.19.0",
     "mongoose": "^8.4.0",
-    "zod": "^3.23.0",
+    "zod": "^4.6.7",
     "winston": "^3.13.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
