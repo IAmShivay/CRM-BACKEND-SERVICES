@@ -1,0 +1,36 @@
+{
+  "name": "crm-platform",
+  "private": true,
+  "packageManager": "npm@10.8.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "docker-compose up -d redis && turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "dev:auth": "cd apps/auth-service && npm run dev",
+    "dev:sales": "cd apps/sales-service && npm run dev",
+    "dev:hr": "cd apps/hr-service && npm run dev",
+    "dev:whatsapp": "cd apps/whatsapp-service && npm run dev",
+    "dev:social": "cd apps/social-service && npm run dev",
+    "dev:billing": "cd apps/billing-service && npm run dev",
+    "dev:marketing": "cd apps/marketing-service && npm run dev",
+    "dev:collaboration": "cd apps/collaboration-service && npm run dev",
+    "dev:analytics": "cd apps/analytics-service && npm run dev",
+    "dev:cms": "cd apps/cms-service && npm run dev",
+    "dev:gateway": "docker-compose up gateway",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "http-proxy": "^1.18.1",
+    "node-fetch": "^3.3.2",
+    "turbo": "^2.0.0"
+  }
+}

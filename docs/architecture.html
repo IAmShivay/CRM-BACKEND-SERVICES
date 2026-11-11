@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Platform Docs</title>
+<style>
+:root{--bg:#ffffff;--sidebar-bg:#f8fafc;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--accent:#2563eb;--accent-light:#eff6ff;--green:#059669;--orange:#d97706;--purple:#7c3aed;--pink:#db2777;--cyan:#0891b2;--red:#dc2626;--shadow:0 1px 2px rgba(0,0,0,.05)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+.sidebar{width:260px;background:var(--sidebar-bg);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:10}
+.sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.sidebar-header h1{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.sidebar-header p{font-size:11px;color:var(--muted);margin-top:2px}
+.sidebar-nav{padding:12px 0}
+.nav-group{padding:0 12px;margin-bottom:4px}
+.nav-group-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);padding:8px 8px 4px}
+.nav-item{display:block;padding:6px 12px;font-size:13px;color:var(--text);text-decoration:none;border-radius:6px;cursor:pointer;transition:background .1s}
+.nav-item:hover{background:#e2e8f0}
+.nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:600}
+.nav-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:8px}
+.main{margin-left:260px;flex:1;min-width:0}
+.topbar{position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;z-index:5}
+.topbar h2{font-size:14px;font-weight:600}
+.breadcrumb{font-size:12px;color:var(--muted)}
+.breadcrumb span{color:var(--accent)}
+.content{padding:32px;max-width:960px}
+.section{display:none}
+.section.active{display:block}
+.section-title{font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px}
+.section-desc{font-size:13px;color:var(--muted);margin-bottom:24px}
+.label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:12px;margin-top:28px}
+.label:first-child{margin-top:0}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.card h3{font-size:13px;font-weight:600;margin-bottom:2px}
+.card p{font-size:12px;color:var(--muted);line-height:1.5}
+.card .port{font-size:11px;font-family:'SF Mono',Consolas,monospace;color:var(--accent);margin-top:4px}
+.grid{display:grid;gap:10px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.g4{grid-template-columns:repeat(4,1fr)}
+.badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.4px}
+.badge-green{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+.badge-orange{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.badge-purple{background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe}
+.badge-cyan{background:#ecfeff;color:#155e75;border:1px solid #a5f3fc}
+.badge-pink{background:#fdf2f8;color:#9d174d;border:1px solid #fbcfe8}
+.badge-blue{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.badge-red{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.badge-gray{background:#f9fafb;color:#374151;border:1px solid #e5e7eb}
+.connector{text-align:center;padding:8px 0;color:#cbd5e1;font-size:18px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:8px 12px;background:#f8fafc;border-bottom:2px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.tbl td{padding:8px 12px;border-bottom:1px solid #f1f5f9}
+.tbl td:first-child{font-weight:600;white-space:nowrap}
+.tbl tr:last-child td{border-bottom:none}
+.tbl-wrap{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.svc-header{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#f8fafc;border-bottom:1px solid var(--border);font-size:13px;font-weight:600}
+.flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:20px 0}
+.flow-step{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 20px;font-size:12px;font-weight:500;box-shadow:var(--shadow)}
+.flow-arrow{color:#94a3b8;padding:0 4px;font-size:16px}
+.env-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.env-card{border-radius:8px;padding:16px;text-align:center;background:var(--bg);box-shadow:var(--shadow)}
+.env-card.dev{border:2px solid var(--green)}
+.env-card.qa{border:2px solid var(--orange)}
+.env-card.prod{border:2px solid var(--red)}
+.env-card h4{font-size:15px;font-weight:700}
+.env-card code{font-size:11px;color:var(--muted);font-family:'SF Mono',Consolas,monospace}
+.note{font-size:11px;color:var(--muted);background:#f8fafc;border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-top:10px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0}.g3,.g4{grid-template-columns:1fr 1fr}.env-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+<div class="sidebar-header">
+<h1>CRM Platform</h1>
+<p>Internal Documentation</p>
+</div>
+<div class="sidebar-nav">
+<div class="nav-group">
+<div class="nav-group-title">Overview</div>
+<a class="nav-item active" onclick="go('overview')">Architecture</a>
+<a class="nav-item" onclick="go('services')">Services Map</a>
+<a class="nav-item" onclick="go('flows')">Cross-service Flows</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">Services</div>
+<a class="nav-item" onclick="go('auth')"><span class="nav-dot dot" style="background:var(--green)"></span>Auth Service</a>
+<a class="nav-item" onclick="go('sales')"><span class="nav-dot dot" style="background:var(--green)"></span>Sales Service</a>
+<a class="nav-item" onclick="go('hr')"><span class="nav-dot dot" style="background:var(--green)"></span>HR Service</a>
+<a class="nav-item" onclick="go('whatsapp')"><span class="nav-dot dot" style="background:var(--orange)"></span>WhatsApp Service</a>
+<a class="nav-item" onclick="go('social')"><span class="nav-dot dot" style="background:var(--orange)"></span>Social Service</a>
+<a class="nav-item" onclick="go('billing')"><span class="nav-dot dot" style="background:var(--purple)"></span>Billing Service</a>
+<a class="nav-item" onclick="go('marketing')"><span class="nav-dot dot" style="background:var(--purple)"></span>Marketing Service</a>
+<a class="nav-item" onclick="go('collaboration')"><span class="nav-dot dot" style="background:var(--cyan)"></span>Collaboration Service</a>
+<a class="nav-item" onclick="go('analytics')"><span class="nav-dot dot" style="background:var(--cyan)"></span>Analytics Service</a>
+<a class="nav-item" onclick="go('cms')"><span class="nav-dot dot" style="background:var(--pink)"></span>CMS Service</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">Infrastructure</div>
+<a class="nav-item" onclick="go('devops')">DevOps &amp; CI/CD</a>
+<a class="nav-item" onclick="go('infra')">OKE &amp; Infisical</a>
+<a class="nav-item" onclick="go('vps')">VPS (Compose)</a>
+<a class="nav-item" onclick="go('config')">Configuration (env)</a>
+</div>
+</div>
+</nav>
+
+<div class="main">
+<div class="topbar">
+<div class="breadcrumb">CRM Platform &nbsp;/&nbsp; <span id="breadcrumb-page">Architecture</span></div>
+<span class="badge badge-blue">v2.2</span>
+</div>
+
+<div class="content">
+
+<!-- ====== OVERVIEW ====== -->
+<div id="sec-overview" class="section active">
+<div class="section-title">Architecture Overview</div>
+<div class="section-desc">10 microservices, Turborepo monorepo, Oracle Kubernetes, Infisical secrets</div>
+
+<div class="label">Client Layer</div>
+<div class="grid g2">
+<div class="card"><h3>Next.js Frontend</h3><p>Vercel hosted &middot; SSR + CSR &middot; single RTK Query API &middot; cookie auth</p><div class="port">rewrites /api/* &rarr; API_GATEWAY_URL (same-origin, no CORS)</div></div>
+<div class="card"><h3>External Consumers</h3><p>Mobile apps &middot; Webhooks &middot; Third-party</p><div class="port">Authorization: Bearer token</div></div>
+</div>
+
+<div class="connector">&darr;</div>
+
+<div class="label">API Gateway</div>
+<div class="card" style="border-left:3px solid var(--orange)">
+<h3>API Gateway &nbsp;<span class="badge badge-orange">OKE: NGINX Ingress</span> <span class="badge badge-gray">VPS: nginx:alpine</span></h3>
+<p>Path-based routing &middot; CORS &middot; cookie forwarding &middot; <code>/api/*/internal</code> returns 404 externally. The Compose gateway resolves upstreams per request via Docker DNS (<code>resolver 127.0.0.11</code>), so recreating a service never 502s.</p>
+</div>
+
+<div class="connector">&darr;</div>
+
+<div class="label">Microservices</div>
+<div class="grid g3">
+<div class="card" style="border-top:3px solid var(--green)"><h3>Auth</h3><p>JWT &middot; RBAC &middot; 2FA &middot; Workspaces</p><div class="port">:8001</div></div>
+<div class="card" style="border-top:3px solid var(--green)"><h3>Sales</h3><p>Leads &middot; Deals &middot; Auto-deal &middot; Pipelines &middot; Invoices</p><div class="port">:8002</div></div>
+<div class="card" style="border-top:3px solid var(--green)"><h3>HR</h3><p>Employees &middot; Attendance &middot; Leaves</p><div class="port">:8003</div></div>
+<div class="card" style="border-top:3px solid var(--orange)"><h3>WhatsApp</h3><p>Meta Graph API &middot; Media proxy &middot; Bot Flows &middot; AI replies</p><div class="port">:8004</div></div>
+<div class="card" style="border-top:3px solid var(--orange)"><h3>Social</h3><p>FB &middot; IG &middot; LinkedIn &middot; X</p><div class="port">:8005</div></div>
+<div class="card" style="border-top:3px solid var(--purple)"><h3>Billing</h3><p>Cashfree &middot; Plans &middot; Subscriptions</p><div class="port">:8006</div></div>
+<div class="card" style="border-top:3px solid var(--purple)"><h3>Marketing</h3><p>Campaign processor &middot; Resend &middot; OpenRouter AI &middot; N8N</p><div class="port">:8007</div></div>
+<div class="card" style="border-top:3px solid var(--cyan)"><h3>Collaboration</h3><p>Chat &middot; Tasks &middot; Projects &middot; Meetings</p><div class="port">:8008</div></div>
+<div class="card" style="border-top:3px solid var(--cyan)"><h3>Analytics</h3><p>Dashboard &middot; Forecast &middot; Metrics</p><div class="port">:8009</div></div>
+</div>
+<div class="grid" style="grid-template-columns:1fr;margin-top:10px">
+<div class="card" style="border-top:3px solid var(--pink)"><h3>CMS</h3><p>Blogs &middot; FMCG (16 modules) &middot; Compliance</p><div class="port">:8010</div></div>
+</div>
+
+<div class="connector">&darr;</div>
+
+<div class="label">Shared Packages</div>
+<div class="grid g4">
+<div class="card" style="background:#f8fafc"><h3>shared-types</h3><p>Constants &middot; Zod &middot; Base classes</p></div>
+<div class="card" style="background:#f8fafc"><h3>logger</h3><p>Winston &middot; Correlation IDs</p></div>
+<div class="card" style="background:#f8fafc"><h3>db</h3><p>MongoDB &middot; Mongoose</p></div>
+<div class="card" style="background:#f8fafc"><h3>auth-middleware</h3><p>JWT &middot; RBAC &middot; verifyInternalKey</p></div>
+</div>
+
+<div class="label">Service-to-service</div>
+<div class="card" style="border-left:3px solid var(--purple)"><h3>Internal routes &nbsp;<span class="badge badge-purple">x-internal-key</span></h3><p>Services call each other over plain HTTP using the k8s/Compose service name (<code>SERVICE_URLS</code> in shared-types) and the shared <code>INTERNAL_API_KEY</code>. These paths are blocked at the gateway: <code>/api/whatsapp/internal/send</code>, <code>/api/ai/internal/auto-reply</code>, <code>/api/deals/internal/from-lead</code>.</p></div>
+
+<div class="connector">&darr;</div>
+
+<div class="label">Data &amp; Infrastructure</div>
+<div class="grid g3">
+<div class="card" style="border-left:3px solid var(--accent)"><h3>MongoDB Atlas</h3><p>70+ collections &middot; Replica set</p></div>
+<div class="card" style="border-left:3px solid var(--red)"><h3>Redis</h3><p>Cache &middot; Sessions &middot; Queues</p></div>
+<div class="card" style="border-left:3px solid var(--purple)"><h3>Infisical</h3><p>Secrets &middot; rotation &middot; k8s operator sync</p></div>
+</div>
+</div>
+
+<!-- ====== SERVICES MAP ====== -->
+<div id="sec-services" class="section">
+<div class="section-title">Services Map</div>
+<div class="section-desc">Route mapping from the gateway to each microservice (identical in nginx.conf and k8s/base/ingress.yaml). Longest prefix wins, which is how <code>/api/webhooks/cashfree</code> reaches billing while <code>/api/webhooks/*</code> goes to marketing.</div>
+
+<div class="tbl-wrap">
+<table class="tbl">
+<thead><tr><th>Route Prefix</th><th>Service</th><th>Port</th><th>Group</th></tr></thead>
+<tr><td>/api/auth, /api/users, /api/roles</td><td>auth-service</td><td>8001</td><td><span class="badge badge-green">Core</span></td></tr>
+<tr><td>/api/workspaces, /api/invites, /api/onboarding, /api/referrals</td><td>auth-service</td><td>8001</td><td><span class="badge badge-green">Core</span></td></tr>
+<tr><td>/api/leads, /api/contacts, /api/deals, /api/pipelines</td><td>sales-service</td><td>8002</td><td><span class="badge badge-green">Core</span></td></tr>
+<tr><td>/api/invoices, /api/quotations, /api/products, /api/appointments</td><td>sales-service</td><td>8002</td><td><span class="badge badge-green">Core</span></td></tr>
+<tr><td>/api/lead-statuses, /api/tags, /api/activities</td><td>sales-service</td><td>8002</td><td><span class="badge badge-green">Core</span></td></tr>
+<tr><td>/api/employees, /api/attendance, /api/leaves, /api/shifts, /api/assets</td><td>hr-service</td><td>8003</td><td><span class="badge badge-green">Core</span></td></tr>
+<tr><td>/api/whatsapp/*</td><td>whatsapp-service</td><td>8004</td><td><span class="badge badge-orange">Comm</span></td></tr>
+<tr><td>/api/social/*</td><td>social-service</td><td>8005</td><td><span class="badge badge-orange">Comm</span></td></tr>
+<tr><td>/api/payments, /api/plans, /api/subscriptions, /api/webhooks/cashfree</td><td>billing-service</td><td>8006</td><td><span class="badge badge-purple">Biz</span></td></tr>
+<tr><td>/api/campaigns, /api/email-sequences, /api/sms, /api/email</td><td>marketing-service</td><td>8007</td><td><span class="badge badge-purple">Biz</span></td></tr>
+<tr><td>/api/engines, /api/webhooks (custom inbound), /api/ai, /api/cron</td><td>marketing-service</td><td>8007</td><td><span class="badge badge-purple">Biz</span></td></tr>
+<tr><td>/api/chat, /api/projects, /api/tasks, /api/sprints</td><td>collaboration-service</td><td>8008</td><td><span class="badge badge-cyan">Collab</span></td></tr>
+<tr><td>/api/columns, /api/meetings, /api/documents, /api/notifications</td><td>collaboration-service</td><td>8008</td><td><span class="badge badge-cyan">Collab</span></td></tr>
+<tr><td>/api/calendar, /api/comments, /api/calls</td><td>collaboration-service</td><td>8008</td><td><span class="badge badge-cyan">Collab</span></td></tr>
+<tr><td>/api/analytics, /api/metrics, /api/dashboard, /api/forecast</td><td>analytics-service</td><td>8009</td><td><span class="badge badge-cyan">Intel</span></td></tr>
+<tr><td>/api/blogs, /api/fmcg, /api/compliance, /api/cms</td><td>cms-service</td><td>8010</td><td><span class="badge badge-pink">Content</span></td></tr>
+<tr><td>/api/health</td><td>auth-service</td><td>8001</td><td><span class="badge badge-gray">Probe</span></td></tr>
+<tr><td>/api/whatsapp/internal/*, /api/ai/internal/*, /api/deals/internal/*</td><td>blocked at gateway (404) &mdash; service-to-service only</td><td>&mdash;</td><td><span class="badge badge-red">Internal</span></td></tr>
+</table>
+</div>
+</div>
+
+<!-- ====== FLOWS ====== -->
+<div id="sec-flows" class="section">
+<div class="section-title">Cross-service Flows</div>
+<div class="section-desc">How requests move between services for the features that span more than one</div>
+
+<div class="label">WhatsApp inbound message</div>
+<div class="flow-row">
+<div class="flow-step">Meta webhook</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">POST /api/whatsapp/webhook</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">store message + upsert conversation</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">link lead/contact (raw collections)</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">BotFlowEngine</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">marketing /ai/internal/auto-reply</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">Meta Graph send</div>
+</div>
+<div class="note">Mode decides the branch: <code>human</code> &rarr; stop (agent owns it) &middot; <code>workflow/ai</code> &rarr; bot flow, then AI reply if unhandled &middot; <code>idle</code> &rarr; bot triggers only. An inbound reply also completes any active campaign/sequence enrollment for that phone.</div>
+
+<div class="label">WhatsApp outbound &amp; media</div>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>Path</th><th>What happens</th></tr></thead>
+<tr><td>POST /api/whatsapp/send</td><td>Create <code>whatsappmessages</code> row (pending) &rarr; Graph <code>/{phoneNumberId}/messages</code> &rarr; status <code>sent</code> + <code>waMessageId</code>, or <code>failed</code> + error. Conversation upserted so new chats appear in the list.</td></tr>
+<tr><td>POST /api/whatsapp/send-template, /broadcast</td><td>Same path with template components; broadcast loops recipients, pauses 1s per 50.</td></tr>
+<tr><td>GET /api/whatsapp/media/:messageId</td><td>Resolves <code>mediaId</code> via Graph, downloads with the account token, streams bytes with content-type (1h private cache). Frontend thumbnails point here.</td></tr>
+<tr><td>POST /api/whatsapp/internal/send</td><td>Used by marketing-service for campaign/sequence steps (text or template). Guarded by <code>x-internal-key</code>.</td></tr>
+<tr><td>POST /api/whatsapp/connect-facebook</td><td>Embedded Signup token &rarr; businesses &rarr; WABAs &rarr; phone numbers &rarr; upsert <code>whatsappaccounts</code>.</td></tr>
+</table></div>
+
+<div class="label">Campaign / sequence processor</div>
+<div class="flow-row">
+<div class="flow-step">setInterval 60s (marketing-service)</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">due enrollments (nextSendAt &le; now)</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">execute step by channel</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">advance / complete</div>
+</div>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>Channel</th><th>Sender</th></tr></thead>
+<tr><td>email</td><td>Resend API (<code>services/emailSender.ts</code>)</td></tr>
+<tr><td>whatsapp</td><td>whatsapp-service internal send; approved template if <code>step.body</code> matches a template name, otherwise text</td></tr>
+<tr><td>sms</td><td><code>smslogs</code> record (provider integration pending)</td></tr>
+<tr><td>ai_reply</td><td>OpenRouter via <code>generateReply()</code>, delivered on <code>replyViaChannel</code></td></tr>
+</table></div>
+<div class="note">Failed sends retry after 1h. <code>POST /api/cron/process-campaigns</code> and <code>/process-sequences</code> remain for manual triggers. Keep marketing-service at 1 replica (no distributed lock).</div>
+
+<div class="label">Lead &rarr; Deal automation</div>
+<div class="flow-row">
+<div class="flow-step">lead created (API / form / social lead form)</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">workspaces.settings.autoCreateDeal?</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">default pipeline (created if missing)</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">deal in first stage, leadId linked</div>
+</div>
+<div class="note">sales-service runs <code>createDealForLead()</code> inline on <code>POST /api/leads</code>; social-service calls <code>POST /api/deals/internal/from-lead</code> after processing a lead-form submission. Duplicate protection: one deal per lead.</div>
+</div>
+
+<!-- ====== INDIVIDUAL SERVICE PAGES ====== -->
+<div id="sec-auth" class="section">
+<div class="section-title">Auth Service <span class="badge badge-green">:8001</span></div>
+<div class="section-desc">Authentication, authorization, workspaces, roles, invitations, onboarding</div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--green)"></span> Collections</div>
+<table class="tbl"><thead><tr><th>Collection</th><th>Key Fields</th><th>Indexes</th></tr></thead>
+<tr><td>users</td><td>email, fullName, password, preferences, twoFactorEnabled, twoFactorSecret</td><td>email (unique)</td></tr>
+<tr><td>workspaces</td><td>name, slug, planId, subscriptionStatus, settings{dateFormat, timeFormat, weekStartsOn, language, autoCreateDeal}, currency, timezone</td><td>slug (unique)</td></tr>
+<tr><td>workspacemembers</td><td>workspaceId, userId, roleId, status, joinedAt</td><td>workspaceId + userId</td></tr>
+<tr><td>roles</td><td>workspaceId, name, permissions[], isDefault, description</td><td>workspaceId + name</td></tr>
+<tr><td>invitations</td><td>workspaceId, email, roleId, token, status, expiresAt, invitedBy</td><td>token (unique)</td></tr>
+<tr><td>onboardingprogresses</td><td>workspaceId, userId, steps{}, percentComplete, isComplete</td><td>workspaceId + userId</td></tr>
+<tr><td>referrals</td><td>workspaceId, referrerUserId, referredEmail, code, status, steps[]</td><td>code (unique)</td></tr>
+</table></div>
+</div>
+
+<div id="sec-sales" class="section">
+<div class="section-title">Sales Service <span class="badge badge-green">:8002</span></div>
+<div class="section-desc">Leads, contacts, deals, pipelines, invoices, quotations, products, appointments</div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--green)"></span> Collections</div>
+<table class="tbl"><thead><tr><th>Collection</th><th>Key Fields</th><th>Indexes</th></tr></thead>
+<tr><td>leads</td><td>workspaceId, name, email, status, statusId, source, leadScore, tagIds[], priority</td><td>workspaceId + status, email (text)</td></tr>
+<tr><td>contacts</td><td>workspaceId, name, email, phone, category, assignedTo, totalRevenue</td><td>workspaceId + category</td></tr>
+<tr><td>deals</td><td>workspaceId, title, value, currency, status, pipelineId, stageId, leadId, contactId, assignedTo, probability, stageEnteredAt, stageHistory[]</td><td>workspaceId + pipelineId</td></tr>
+<tr><td>pipelines</td><td>workspaceId, name, isDefault, isActive, currency</td><td>workspaceId + name (unique)</td></tr>
+<tr><td>pipelinestages</td><td>workspaceId, pipelineId, name, color, order, probability, isWonStage, isLostStage</td><td>pipelineId + order, pipelineId + name (unique)</td></tr>
+<tr><td>invoices</td><td>workspaceId, invoiceNumber, amount, tax, status, dueDate, contactId</td><td>workspaceId + status</td></tr>
+<tr><td>quotations</td><td>workspaceId, quotationNumber, amount, status, validUntil, contactId</td><td>workspaceId</td></tr>
+<tr><td>products</td><td>workspaceId, name, sku, price, stock, category</td><td>workspaceId + sku</td></tr>
+<tr><td>appointments</td><td>workspaceId, title, startTime, endTime, status, leadId, type</td><td>workspaceId + startTime</td></tr>
+<tr><td>activities</td><td>workspaceId, entityType, entityId, activityType, description, metadata</td><td>workspaceId + entityType + entityId</td></tr>
+<tr><td>leadnotes</td><td>leadId, workspaceId, content, type, createdBy</td><td>leadId + createdAt</td></tr>
+<tr><td>leadstatuses</td><td>workspaceId, name, color, order, isDefault, isActive</td><td>workspaceId + order</td></tr>
+<tr><td>tags</td><td>workspaceId, name, color, description</td><td>workspaceId + name</td></tr>
+</table></div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--green)"></span> Automation &amp; internal routes</div>
+<table class="tbl"><thead><tr><th>Item</th><th>Description</th></tr></thead>
+<tr><td>services/dealAutomation.ts</td><td><code>createDealForLead()</code>: reads <code>workspaces.settings.autoCreateDeal</code>, ensures a default pipeline (seeds <code>DEFAULT_PIPELINE_STAGES</code> from shared-types), creates the deal in the first stage.</td></tr>
+<tr><td>POST /api/deals/internal/from-lead</td><td>Internal-key route used by social-service after a lead-form submission is processed.</td></tr>
+<tr><td>GET /api/deals?leadId=</td><td>Filter deals by linked lead (lead details sheet uses it).</td></tr>
+</table></div>
+</div>
+
+<div id="sec-hr" class="section">
+<div class="section-title">HR Service <span class="badge badge-green">:8003</span></div>
+<div class="section-desc">Employee management, attendance tracking, leave requests, shifts, asset management</div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--green)"></span> Collections</div>
+<table class="tbl"><thead><tr><th>Collection</th><th>Key Fields</th><th>Indexes</th></tr></thead>
+<tr><td>attendances</td><td>workspaceId, userId, date, clockIn, clockOut, status, workType, shiftId</td><td>workspaceId + userId + date</td></tr>
+<tr><td>leave_requests</td><td>workspaceId, userId, type, startDate, endDate, status, reason</td><td>workspaceId + userId</td></tr>
+<tr><td>shifts</td><td>workspaceId, name, startTime, endTime, workType, totalHours</td><td>workspaceId</td></tr>
+<tr><td>assets</td><td>workspaceId, name, type, serialNumber, assignedTo, status, condition</td><td>workspaceId + type</td></tr>
+</table></div>
+</div>
+
+<div id="sec-whatsapp" class="section">
+<div class="section-title">WhatsApp Service <span class="badge badge-orange">:8004</span></div>
+<div class="section-desc">Meta Cloud API integration, templates, conversations, bot flows, broadcast</div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--orange)"></span> Collections</div>
+<table class="tbl"><thead><tr><th>Collection</th><th>Key Fields</th><th>Indexes</th></tr></thead>
+<tr><td>whatsappaccounts</td><td>workspaceId, phoneNumberId, businessAccountId, accessToken, provider, qualityRating</td><td>phoneNumberId (unique)</td></tr>
+<tr><td>whatsappmessages</td><td>workspaceId, accountId, conversationId, from, to, direction, messageType, content, mediaId, mimeType, fileName, templateName, status, waMessageId, metadata.sentBy (agent/bot/ai/campaign/sequence/broadcast)</td><td>workspaceId + from, workspaceId + to, waMessageId, TTL 180d</td></tr>
+<tr><td>whatsapptemplates</td><td>workspaceId, name, category, status, language, components[], metaTemplateId</td><td>workspaceId + name</td></tr>
+<tr><td>whatsappconversations</td><td>workspaceId, contactPhone, contactName, mode, aiEnabled, lastMessagePreview</td><td>workspaceId + contactPhone</td></tr>
+<tr><td>whatsappbotflows</td><td>workspaceId, accountId, name, steps[{id, type, data, position, connections[]}], triggerKeywords[], isActive, createdBy</td><td>workspaceId</td></tr>
+</table></div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--orange)"></span> Endpoints</div>
+<table class="tbl"><thead><tr><th>Endpoint</th><th>Notes</th></tr></thead>
+<tr><td>GET/POST/PUT/DELETE /accounts, POST /connect-facebook</td><td>Only <code>isActive</code> accounts listed; delete deactivates; accessToken never returned.</td></tr>
+<tr><td>POST /send, /send-template, /broadcast</td><td>Real Meta Graph sends via <code>services/whatsappService.ts</code>; 502 with Meta error on failure.</td></tr>
+<tr><td>GET /conversations</td><td>Aggregated from messages (grouped by phone) merged with conversation state; <code>?phone=</code> returns the thread + state and marks inbound as read.</td></tr>
+<tr><td>POST /conversations/:id/handoff</td><td><code>take_over</code> / <code>release</code>; id may be a conversation id or a phone.</td></tr>
+<tr><td>GET /media/:messageId</td><td>Authenticated media proxy for inbound image/video/audio/document.</td></tr>
+<tr><td>GET/POST/PUT/DELETE /templates, POST /templates/sync, /templates/:id/submit</td><td>Sync pulls from Meta; submit pushes a local template for review.</td></tr>
+<tr><td>/bot-flows</td><td>Returns <code>botFlows</code> / <code>botFlow</code>; create sets <code>createdBy</code>.</td></tr>
+<tr><td>GET/POST /webhook</td><td>Verify token per account; POST acks 200 immediately then processes.</td></tr>
+<tr><td>POST /internal/send</td><td>Service-to-service sender.</td></tr>
+</table></div>
+</div>
+
+<div id="sec-social" class="section">
+<div class="section-title">Social Service <span class="badge badge-orange">:8005</span></div>
+<div class="section-desc">Multi-platform social media management with OAuth and AI content generation</div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--orange)"></span> Collections</div>
+<table class="tbl"><thead><tr><th>Collection</th><th>Key Fields</th><th>Indexes</th></tr></thead>
+<tr><td>socialaccounts</td><td>workspaceId, platform, accountId, accessToken, refreshToken, displayName</td><td>workspaceId + platform</td></tr>
+<tr><td>socialposts</td><td>workspaceId, accountId, platform, content, mediaUrls[], status, scheduledAt</td><td>workspaceId + status</td></tr>
+<tr><td>socialoauthconnections</td><td>workspaceId, platform, state, codeVerifier, redirectUri</td><td>state (unique)</td></tr>
+<tr><td>leadformintegrations</td><td>workspaceId, platform (facebook | instagram | google_ads | linkedin), accountId, accountName, accessToken, refreshToken, tokenExpiresAt, pageId, adAccountId, webhookSubscribed, isActive, lastSyncAt</td><td>workspaceId + platform</td></tr>
+<tr><td>leadformsubmissions</td><td>workspaceId, integrationId, platform, formId, formName, externalLeadId, fieldData[], rawPayload, status (pending | processed | failed | skipped), crmLeadId, processedAt</td><td>workspaceId + status</td></tr>
+</table></div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--orange)"></span> Endpoints (/api/social)</div>
+<table class="tbl"><thead><tr><th>Endpoint</th><th>Notes</th></tr></thead>
+<tr><td>/accounts, /posts, POST /generate</td><td>Social accounts, scheduled posts, AI post generation.</td></tr>
+<tr><td>GET /oauth, GET /oauth/callback</td><td>Platform OAuth for posting accounts (LinkedIn, X, Meta).</td></tr>
+<tr><td>GET /lead-forms/oauth-url, POST /lead-forms/facebook | /google | /linkedin</td><td>Connect a lead-form source; Facebook/Instagram subscribes the page to <code>leadgen</code>.</td></tr>
+<tr><td>GET /lead-forms, DELETE /lead-forms/:id</td><td>List / disconnect integrations.</td></tr>
+<tr><td>GET /lead-forms/submissions, POST /lead-forms/submissions/:id/process</td><td>Review raw submissions; process = insert into <code>leads</code> then call sales <code>/api/deals/internal/from-lead</code>.</td></tr>
+<tr><td>POST /lead-forms/sync/google, /sync/linkedin</td><td>Pull leads for providers without webhooks.</td></tr>
+<tr><td>GET/POST /webhook/leadgen</td><td>Meta leadgen webhook (verify with <code>META_WEBHOOK_VERIFY_TOKEN</code>).</td></tr>
+</table></div>
+</div>
+
+<div id="sec-billing" class="section">
+<div class="section-title">Billing Service <span class="badge badge-purple">:8006</span></div>
+<div class="section-desc">Cashfree payment gateway, subscription plans, payment records</div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--purple)"></span> Collections</div>
+<table class="tbl"><thead><tr><th>Collection</th><th>Key Fields</th><th>Indexes</th></tr></thead>
+<tr><td>plans</td><td>name, interval, price, features[], limits{}, isActive</td><td>name (unique)</td></tr>
+<tr><td>subscriptions</td><td>workspaceId, planId, status, cashfreeSubscriptionId, currentPeriodEnd</td><td>workspaceId (unique)</td></tr>
+<tr><td>paymentrecords</td><td>workspaceId, orderId, amount, status, provider, cashfreeOrderId</td><td>orderId (unique)</td></tr>
+</table></div>
+<div class="note">Endpoints: <code>/api/plans</code>, <code>/api/subscriptions</code> (get / cancel), <code>/api/payments</code> (create order, verify), <code>POST /api/webhooks/cashfree</code> (provider callback &mdash; routed to billing by the longer-prefix gateway rule).</div>
+</div>
+
+<div id="sec-marketing" class="section">
+<div class="section-title">Marketing Service <span class="badge badge-purple">:8007</span></div>
+<div class="section-desc">Campaigns, email sequences, SMS, AI auto-reply, N8N workflow engine, webhooks</div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--purple)"></span> Collections</div>
+<table class="tbl"><thead><tr><th>Collection</th><th>Key Fields</th><th>Indexes</th></tr></thead>
+<tr><td>campaigns</td><td>workspaceId, name, status, channel, steps[], audience</td><td>workspaceId + status</td></tr>
+<tr><td>campaignenrollments</td><td>workspaceId, campaignId, leadId, status, currentStep</td><td>campaignId + leadId</td></tr>
+<tr><td>emailsequences</td><td>workspaceId, name, steps[], status</td><td>workspaceId</td></tr>
+<tr><td>sequenceenrollments</td><td>workspaceId, sequenceId, leadId, status, currentStep</td><td>sequenceId + leadId</td></tr>
+<tr><td>emailaccounts</td><td>workspaceId, email, provider, accessToken, isDefault</td><td>workspaceId</td></tr>
+<tr><td>smstemplates</td><td>workspaceId, name, body, type, variables[]</td><td>workspaceId</td></tr>
+<tr><td>smslogs</td><td>workspaceId, to, message, status, provider, templateId</td><td>workspaceId + createdAt</td></tr>
+<tr><td>webhooks</td><td>workspaceId, name, targetUrl, events[], slug, isActive</td><td>slug (unique)</td></tr>
+<tr><td>webhooklogs</td><td>webhookId, payload, statusCode, response, duration</td><td>webhookId + createdAt</td></tr>
+<tr><td>n8napikeys</td><td>workspaceId, name, apiKey, baseUrl, isActive</td><td>workspaceId</td></tr>
+<tr><td>workflowcatalogs</td><td>workspaceId, n8nApiKeyId, externalId, name, isActive, tags[]</td><td>workspaceId + externalId</td></tr>
+<tr><td>workflowexecutions</td><td>workspaceId, workflowId, status, tokensUsed, cost, inputData, outputData</td><td>workspaceId + createdAt</td></tr>
+<tr><td>userinputs</td><td>workspaceId, executionId, workflowId, status, prompt, fields[], priority</td><td>workspaceId + status</td></tr>
+</table></div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--purple)"></span> Services</div>
+<table class="tbl"><thead><tr><th>File</th><th>Role</th></tr></thead>
+<tr><td>services/campaignProcessor.ts</td><td>Due-enrollment processor (email / whatsapp / sms / ai_reply), started from <code>server.ts</code> every <code>CAMPAIGN_PROCESS_INTERVAL_MS</code>.</td></tr>
+<tr><td>services/whatsappClient.ts</td><td>Calls whatsapp-service <code>/internal/send</code>.</td></tr>
+<tr><td>services/emailSender.ts</td><td>Resend transactional API (<code>RESEND_API_KEY</code>, <code>EMAIL_FROM_ADDRESS</code>).</td></tr>
+<tr><td>controllers/aiController.ts</td><td><code>generateReply()</code> via OpenRouter (<code>PLATFORM_OPENROUTER_API_KEY</code>, <code>OPENROUTER_MODEL</code>); exposed as <code>POST /api/ai/auto-reply</code> (user) and <code>/api/ai/internal/auto-reply</code> (services).</td></tr>
+</table></div>
+</div>
+
+<div id="sec-collaboration" class="section">
+<div class="section-title">Collaboration Service <span class="badge badge-cyan">:8008</span></div>
+<div class="section-desc">Chat, project management, tasks, sprints, meetings, calendar, calls, comments</div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--cyan)"></span> Collections</div>
+<table class="tbl"><thead><tr><th>Collection</th><th>Key Fields</th><th>Indexes</th></tr></thead>
+<tr><td>chatrooms</td><td>workspaceId, name, type, participants[], settings</td><td>workspaceId + type</td></tr>
+<tr><td>messages</td><td>chatRoomId, content, senderId, type, reactions[], attachments[]</td><td>chatRoomId + createdAt</td></tr>
+<tr><td>projects</td><td>workspaceId, name, status, visibility, description</td><td>workspaceId + status</td></tr>
+<tr><td>tasks</td><td>workspaceId, projectId, title, status, priority, assigneeId, columnId, sprintId</td><td>projectId + status</td></tr>
+<tr><td>sprints</td><td>workspaceId, projectId, name, startDate, endDate, status, goal</td><td>projectId</td></tr>
+<tr><td>columns</td><td>workspaceId, projectId, name, order, color</td><td>projectId + order</td></tr>
+<tr><td>meetings</td><td>workspaceId, title, startTime, endTime, type, status, meetingUrl</td><td>workspaceId + startTime</td></tr>
+<tr><td>documents</td><td>workspaceId, title, content, folderId, createdBy, sharedWith[], version</td><td>workspaceId</td></tr>
+<tr><td>notifications</td><td>workspaceId, userId, type, title, message, isRead, level</td><td>userId + isRead</td></tr>
+<tr><td>calendarevents</td><td>workspaceId, title, startTime, endTime, attendees[], recurrence</td><td>workspaceId + startTime</td></tr>
+<tr><td>comments</td><td>entityType, entityId, content, createdBy, parentId, isDeleted, editHistory[]</td><td>entityType + entityId</td></tr>
+<tr><td>callsettings</td><td>workspaceId, provider, apiKey, apiSecret, callerId, isActive</td><td>workspaceId (unique)</td></tr>
+<tr><td>calllogs</td><td>workspaceId, callId, direction, from, to, status, duration, leadId</td><td>workspaceId + createdAt</td></tr>
+</table></div>
+<div class="note">Route prefixes: /chat (+ /chat/messages, rooms, upload), /projects, /tasks, /sprints, /columns, /meetings, /documents (<code>GET /:id/public</code> is unauthenticated and backs the <code>/shared/document/[id]</code> page), /notifications, /calendar, /comments, /calls. There is no socket.io server in the microservices yet; chat is REST-only.</div>
+</div>
+
+<div id="sec-analytics" class="section">
+<div class="section-title">Analytics Service <span class="badge badge-cyan">:8009</span></div>
+<div class="section-desc">Dashboard stats, pipeline analytics, forecasting, timeseries, performance metrics</div>
+<div class="note">Analytics service reads from collections owned by other services (leads, deals, contacts, activities). It does not own any collections &mdash; all queries use raw MongoDB aggregation via <code>mongoose.connection.db.collection()</code>. Gateway prefixes: <code>/api/analytics</code>, <code>/api/metrics</code>, <code>/api/dashboard</code>, <code>/api/forecast</code>.</div>
+<div class="tbl-wrap" style="margin-top:12px"><div class="svc-header"><span class="dot" style="background:var(--cyan)"></span> Endpoints</div>
+<table class="tbl"><thead><tr><th>Endpoint</th><th>Description</th><th>Source Collections</th></tr></thead>
+<tr><td>GET /api/analytics/dashboard</td><td>Total leads, contacts, deals, revenue, conversion rate</td><td>leads, contacts, deals, activities</td></tr>
+<tr><td>GET /api/analytics/dashboard/sources</td><td>Lead distribution by source</td><td>leads</td></tr>
+<tr><td>GET /api/analytics/performance</td><td>Team member performance metrics</td><td>leads, deals, activities</td></tr>
+<tr><td>GET /api/analytics/pipeline</td><td>Pipeline stage distribution</td><td>deals, pipelines</td></tr>
+<tr><td>GET /api/analytics/forecast/revenue</td><td>Revenue forecast by month</td><td>deals</td></tr>
+<tr><td>GET /api/analytics/timeseries/*</td><td>Leads, deals, revenue over time</td><td>leads, deals</td></tr>
+<tr><td>GET /api/metrics</td><td>30-day comparison metrics</td><td>leads, deals</td></tr>
+</table></div>
+</div>
+
+<div id="sec-cms" class="section">
+<div class="section-title">CMS Service <span class="badge badge-pink">:8010</span></div>
+<div class="section-desc">Blog management, FMCG compliance (16 modules), regulatory document tracking</div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--pink)"></span> Core Collections</div>
+<table class="tbl"><thead><tr><th>Collection</th><th>Key Fields</th><th>Indexes</th></tr></thead>
+<tr><td>blogs</td><td>title, slug, content, status, author, categoryId, featuredImage</td><td>slug (unique)</td></tr>
+<tr><td>blogcategories</td><td>name, slug, description</td><td>slug (unique)</td></tr>
+<tr><td>compliancetasks</td><td>workspaceId, title, category, dueDate, status, isRecurring, portalUrl</td><td>workspaceId + dueDate</td></tr>
+<tr><td>compliancedocuments</td><td>workspaceId, name, category, expiryDate, status, documentUrl, retentionYears</td><td>workspaceId + expiryDate</td></tr>
+</table></div>
+<div class="tbl-wrap"><div class="svc-header"><span class="dot" style="background:var(--pink)"></span> FMCG Collections (16)</div>
+<table class="tbl"><thead><tr><th>Collection</th><th>Key Fields</th></tr></thead>
+<tr><td>fmcgproducts</td><td>workspaceId, name, sku, category, batchSize</td></tr>
+<tr><td>fmcgbatches</td><td>workspaceId, productId, batchNumber, status, mfgDate, expDate</td></tr>
+<tr><td>fmcgsuppliers</td><td>workspaceId, name, contactPerson, category, licenseNumber</td></tr>
+<tr><td>fmcgrmlots</td><td>workspaceId, supplierId, material, lotNumber, quantity</td></tr>
+<tr><td>fmcgtestreports</td><td>workspaceId, batchId, testType, result, testedBy</td></tr>
+<tr><td>fmcgtemperaturelogs</td><td>workspaceId, location, temperature, humidity, recordedAt</td></tr>
+<tr><td>fmcgcleaninglogs</td><td>workspaceId, area, cleanedBy, verifiedBy, status</td></tr>
+<tr><td>fmcgcalibrationlogs</td><td>workspaceId, equipment, calibratedBy, nextDueDate</td></tr>
+<tr><td>fmcgpestlogs</td><td>workspaceId, area, pestType, treatment, treatedBy</td></tr>
+<tr><td>fmcgwatertests</td><td>workspaceId, source, parameters, result, testedBy</td></tr>
+<tr><td>fmcgcomplaintregisters</td><td>workspaceId, productId, complaint, severity, status</td></tr>
+<tr><td>fmcgdistributions</td><td>workspaceId, batchId, destination, quantity, dispatchDate</td></tr>
+<tr><td>fmcgrecallevents</td><td>workspaceId, batchId, reason, severity, status</td></tr>
+<tr><td>fmcgfssailicenses</td><td>workspaceId, licenseNumber, category, expiryDate, status</td></tr>
+</table></div>
+</div>
+
+<!-- ====== DEVOPS ====== -->
+<div id="sec-devops" class="section">
+<div class="section-title">DevOps &amp; CI/CD</div>
+<div class="section-desc">Two GitHub Actions pipelines from the same root Dockerfile: OKE (Kustomize) and VPS (Docker Compose)</div>
+
+<div class="label">OKE pipeline &mdash; deploy-oke.yml</div>
+<div class="flow-row">
+<div class="flow-step"><strong>git push</strong></div>
+<div class="flow-arrow">&rarr;</div>
+<div class="flow-step">Lint + Types</div>
+<div class="flow-arrow">&rarr;</div>
+<div class="flow-step">Turbo Build</div>
+<div class="flow-arrow">&rarr;</div>
+<div class="flow-step">Docker (ARM64)</div>
+<div class="flow-arrow">&rarr;</div>
+<div class="flow-step">Push OCIR</div>
+<div class="flow-arrow">&rarr;</div>
+<div class="flow-step">Kustomize</div>
+<div class="flow-arrow">&rarr;</div>
+<div class="flow-step">OKE Deploy</div>
+</div>
+
+<div class="label">VPS pipeline &mdash; deploy-vps.yml</div>
+<div class="flow-row">
+<div class="flow-step"><strong>git push</strong></div>
+<div class="flow-arrow">&rarr;</div>
+<div class="flow-step">npm ci + build</div>
+<div class="flow-arrow">&rarr;</div>
+<div class="flow-step">Docker &times;10 (build args)</div>
+<div class="flow-arrow">&rarr;</div>
+<div class="flow-step">Push GHCR</div>
+<div class="flow-arrow">&rarr;</div>
+<div class="flow-step">scp compose + nginx.conf + sync script</div>
+<div class="flow-arrow">&rarr;</div>
+<div class="flow-step">infisical-sync.sh &rarr; compose up</div>
+</div>
+
+<div class="label">Environment Mapping</div>
+<div class="env-grid">
+<div class="env-card dev"><h4>Development</h4><code>branch: develop</code><p style="font-size:11px;color:var(--muted);margin-top:6px">OKE ns: crm-dev &middot; VPS: /opt/crm-platform/dev</p></div>
+<div class="env-card qa"><h4>QA / Staging</h4><code>branch: qa (OKE) &middot; staging (VPS)</code><p style="font-size:11px;color:var(--muted);margin-top:6px">OKE ns: crm-qa &middot; VPS: /opt/crm-platform/staging</p></div>
+<div class="env-card prod"><h4>Production</h4><code>branch: main</code><p style="font-size:11px;color:var(--muted);margin-top:6px">OKE ns: crm-prod &middot; VPS: /opt/crm-platform/prod</p></div>
+</div>
+<div class="note">GitHub holds infrastructure credentials only (OCI, SSH, Infisical machine identity). Application secrets live in Infisical for both targets.</div>
+
+<div class="label">Docker Build</div>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>Stage</th><th>Action</th></tr></thead>
+<tr><td>1. Pruner</td><td>turbo prune per service &mdash; extracts only needed packages</td></tr>
+<tr><td>2. Builder</td><td>npm ci &rarr; turbo build &mdash; compiles TypeScript to JavaScript</td></tr>
+<tr><td>3. Runner</td><td>npm ci --omit=dev &rarr; copy dist/ &mdash; production image with node dist/server.js</td></tr>
+</table></div>
+<div class="note">Platform: linux/arm64 &middot; Base: node:20-alpine &middot; Non-root user (appuser:1001) &middot; Health checks via wget</div>
+</div>
+
+<!-- ====== INFRA ====== -->
+<div id="sec-infra" class="section">
+<div class="section-title">OKE &amp; Infisical</div>
+<div class="section-desc">Oracle Kubernetes Engine (Always Free) with Infisical secrets management and rotation</div>
+
+<div class="label">Oracle Cloud Resources</div>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>Resource</th><th>Spec</th><th>Cost</th></tr></thead>
+<tr><td>OKE Control Plane</td><td>Managed Kubernetes v1.30</td><td><span class="badge badge-green">FREE</span></td></tr>
+<tr><td>Node Pool</td><td>VM.Standard.A1.Flex (ARM)</td><td><span class="badge badge-green">FREE</span></td></tr>
+<tr><td>Compute</td><td>4 OCPU &middot; 12 GB RAM</td><td><span class="badge badge-green">FREE</span></td></tr>
+<tr><td>Load Balancer</td><td>Flexible 10 Mbps</td><td><span class="badge badge-green">FREE</span></td></tr>
+<tr><td>Container Registry</td><td>OCIR &middot; Private repos</td><td><span class="badge badge-green">FREE</span></td></tr>
+<tr><td>Boot Volume</td><td>50 GB block storage</td><td><span class="badge badge-green">FREE</span></td></tr>
+<tr><td>Egress</td><td>10 TB / month</td><td><span class="badge badge-green">FREE</span></td></tr>
+</table></div>
+<div class="note">Total monthly cost: <strong>$0</strong></div>
+
+<div class="label">K8s Resource Allocation</div>
+<div class="grid g2">
+<div class="card"><h3>Requests (guaranteed)</h3><p style="font-size:13px;margin-top:4px"><strong>CPU:</strong> 50m &nbsp;&middot;&nbsp; <strong>Memory:</strong> 96Mi per pod</p></div>
+<div class="card"><h3>Limits (burst)</h3><p style="font-size:13px;margin-top:4px"><strong>CPU:</strong> 250m &nbsp;&middot;&nbsp; <strong>Memory:</strong> 192Mi per pod</p></div>
+</div>
+<div class="note">10 pods &times; 96Mi = 960Mi guaranteed &nbsp;|&nbsp; Redis 32Mi &nbsp;|&nbsp; Total: ~1 GB of 12 GB</div>
+
+<div class="label">Manifests (k8s/)</div>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>Path</th><th>Purpose</th></tr></thead>
+<tr><td>base/services.yaml</td><td>10 Deployments + Services. Each pod: <code>envFrom crm-env</code>, <code>imagePullSecrets: ocir-secret</code>, annotation <code>secrets.infisical.com/auto-reload</code>, probes on <code>/api/health</code>.</td></tr>
+<tr><td>base/ingress.yaml</td><td>NGINX Ingress path routing (same prefixes as the Services Map).</td></tr>
+<tr><td>overlays/&lt;env&gt;/</td><td><code>namespace: crm-&lt;env&gt;</code>, image renames to OCIR, <code>infisical.yaml</code> (InfisicalSecret &rarr; <code>crm-env</code>). No namePrefix, so in-cluster DNS matches <code>SERVICE_URLS</code>.</td></tr>
+<tr><td>SETUP.md</td><td>Step-by-step: OCI CLI &rarr; cluster &rarr; OCIR &rarr; Infisical project + operator &rarr; branches &rarr; deploy.</td></tr>
+</table></div>
+
+<div class="label">Infisical</div>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>Environment</th><th>Consumer</th><th>Keys</th></tr></thead>
+<tr><td>dev / qa / prod</td><td>OKE: Infisical Operator &rarr; <code>crm-env</code> Secret &rarr; <code>envFrom</code></td><td>MONGODB_URI, JWT_SECRET, CORS_ORIGIN, APP_URL, INTERNAL_API_KEY, RESEND_API_KEY, PLATFORM_OPENROUTER_API_KEY, META_*, GOOGLE_ADS_*, LINKEDIN_*</td></tr>
+<tr><td>dev / staging / prod</td><td>VPS: Infisical CLI (cron sync) &rarr; <code>.env</code> &rarr; <code>env_file</code></td><td>CASHFREE_*, N8N_*, NEXT_PUBLIC_META_APP_ID, GOOGLE_OAUTH_*</td></tr>
+</table></div>
+<div class="note">One Machine Identity per environment. Rotation: operator resyncs every 60s and restarts annotated Deployments; VPS cron re-exports every 5 min and recreates changed containers. No app secrets in GitHub or git.</div>
+</div>
+
+<!-- ====== VPS ====== -->
+<div id="sec-vps" class="section">
+<div class="section-title">VPS (Compose)</div>
+<div class="section-desc">Single-host alternative to OKE: images from GHCR, nginx gateway, Infisical CLI for secrets</div>
+
+<div class="label">Runtime layout on the host</div>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>File (/opt/crm-platform/&lt;env&gt;)</th><th>Role</th></tr></thead>
+<tr><td>docker-compose.yml</td><td>Copy of <code>docker-compose.prod.yml</code>: 10 services + redis + n8n + gateway. Only the gateway port is published (<code>GATEWAY_PORT</code>, default 8000).</td></tr>
+<tr><td>nginx.conf</td><td>Copy of <code>apps/gateway/nginx.conf</code>, mounted into <code>nginx:alpine</code>. Dynamic upstream resolution via Docker DNS.</td></tr>
+<tr><td>deploy.env</td><td>Non-secret deploy values written by CI: <code>IMAGE_PREFIX</code>, <code>TAG</code>, <code>GATEWAY_PORT</code>.</td></tr>
+<tr><td>infisical.conf</td><td>Machine identity + project id + env slug (chmod 600).</td></tr>
+<tr><td>infisical-sync.sh</td><td><code>infisical export</code> &rarr; merge with deploy.env &rarr; <code>.env</code>; if changed, <code>docker compose up -d</code>. Run by CI on deploy and by cron every 5 min for rotation.</td></tr>
+</table></div>
+
+<div class="label">Rotation path</div>
+<div class="flow-row">
+<div class="flow-step">rotate key in Infisical</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">cron */5 infisical-sync.sh</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">.env diff detected</div><div class="flow-arrow">&rarr;</div>
+<div class="flow-step">compose recreates affected containers</div>
+</div>
+<div class="note">Put TLS in front of the gateway (Caddy / Cloudflare Tunnel / certbot). Meta webhook URL: <code>https://&lt;api-domain&gt;/api/whatsapp/webhook</code>. Full checklist in <code>VPS.md</code>.</div>
+</div>
+
+<!-- ====== CONFIG ====== -->
+<div id="sec-config" class="section">
+<div class="section-title">Configuration (env)</div>
+<div class="section-desc">Every <code>process.env</code> key the services read, who reads it, and where it comes from</div>
+
+<div class="label">Shared by all services</div>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>Key</th><th>Read by</th><th>Source</th><th>Notes</th></tr></thead>
+<tr><td>MONGODB_URI</td><td>packages/db</td><td>Infisical</td><td>Atlas connection string</td></tr>
+<tr><td>JWT_SECRET, JWT_EXPIRES_IN</td><td>auth-middleware, auth-service</td><td>Infisical</td><td>Cookie JWT; default expiry 7d</td></tr>
+<tr><td>CORS_ORIGIN</td><td>every app.ts</td><td>Infisical</td><td>Browser origin (only relevant for direct API consumers)</td></tr>
+<tr><td>INTERNAL_API_KEY</td><td>auth-middleware (verifyInternalKey), whatsapp, marketing, social</td><td>Infisical</td><td>Service-to-service header <code>x-internal-key</code></td></tr>
+<tr><td>WHATSAPP_SERVICE_URL, MARKETING_SERVICE_URL, SALES_SERVICE_URL</td><td>shared-types SERVICE_URLS</td><td>optional</td><td>Default to <code>http://&lt;service&gt;:&lt;port&gt;</code>, valid in Compose and k8s</td></tr>
+<tr><td>NODE_ENV, PORT, SERVICE_NAME, LOG_LEVEL</td><td>logger, server.ts</td><td>Deployment manifest / compose</td><td>Runtime flags</td></tr>
+</table></div>
+
+<div class="label">Per service</div>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>Service</th><th>Keys</th></tr></thead>
+<tr><td>marketing-service</td><td>RESEND_API_KEY, EMAIL_FROM_ADDRESS (fallback EMAIL_FROM), PLATFORM_OPENROUTER_API_KEY (fallback OPENROUTER_API_KEY), OPENROUTER_MODEL, APP_URL (fallback NEXT_PUBLIC_APP_URL), SMS_PROVIDER, N8N_BASE_URL, N8N_API_KEY</td></tr>
+<tr><td>social-service</td><td>META_APP_ID, FACEBOOK_APP_ID, META_APP_SECRET, META_WEBHOOK_VERIFY_TOKEN, GOOGLE_ADS_CLIENT_ID, GOOGLE_ADS_CLIENT_SECRET, LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET, TWITTER_CLIENT_ID, SOCIAL_OAUTH_REDIRECT</td></tr>
+<tr><td>billing-service</td><td>CASHFREE_APP_ID, CASHFREE_SECRET_KEY</td></tr>
+<tr><td>whatsapp-service</td><td>INTERNAL_API_KEY only &mdash; Meta tokens are per account in <code>whatsappaccounts</code></td></tr>
+<tr><td>auth / sales / hr / collaboration / analytics / cms</td><td>Shared keys only</td></tr>
+</table></div>
+
+<div class="label">Where values live</div>
+<div class="grid g3">
+<div class="card"><h3>Local</h3><p><code>.env</code> at repo root (gitignored), loaded by <code>env_file</code> in docker-compose.yml. <code>.env.example</code> is the template.</p></div>
+<div class="card"><h3>OKE</h3><p>Infisical project env (dev/qa/prod) &rarr; operator &rarr; <code>crm-env</code> Secret &rarr; <code>envFrom</code>. Only PORT/SERVICE_NAME are set in the manifest.</p></div>
+<div class="card"><h3>VPS</h3><p>Infisical CLI export merged with <code>deploy.env</code> into <code>.env</code> by <code>infisical-sync.sh</code>.</p></div>
+</div>
+<div class="note">Frontend-only keys (<code>NEXT_PUBLIC_*</code>, <code>API_GATEWAY_URL</code>) are documented in the CRM-SASS docs; they are not read by any service here.</div>
+</div>
+
+</div>
+</div>
+
+<script>
+function go(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  const names={overview:'Architecture',services:'Services Map',auth:'Auth Service',sales:'Sales Service',hr:'HR Service',whatsapp:'WhatsApp Service',social:'Social Service',billing:'Billing Service',marketing:'Marketing Service',collaboration:'Collaboration Service',analytics:'Analytics Service',cms:'CMS Service',devops:'DevOps & CI/CD',infra:'OKE & Infisical',flows:'Cross-service Flows',vps:'VPS (Compose)',config:'Configuration (env)'};
+  document.getElementById('breadcrumb-page').textContent=names[id]||id;
+  event.target.classList.add('active');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

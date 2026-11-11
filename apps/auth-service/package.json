@@ -1,0 +1,46 @@
+{
+  "name": "@crm-platform/auth-service",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
+  },
+  "dependencies": {
+    "@crm-platform/auth-middleware": "file:../../packages/auth-middleware",
+    "@crm-platform/db": "file:../../packages/db",
+    "@crm-platform/logger": "file:../../packages/logger",
+    "@crm-platform/shared-types": "file:../../packages/shared-types",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^18.0.5",
+    "express": "^4.19.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.0",
+    "speakeasy": "^2.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "winston": "^3.13.0",
+    "zod": "^3.23.0",
+    "qrcode": "^1.5.4",
+    "multer": "^1.4.5-lts.1",
+    "@crm-platform/storage": "file:../../packages/storage"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.7",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.12.0",
+    "@types/speakeasy": "^2.0.10",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.6",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.0",
+    "@types/qrcode": "^1.5.6",
+    "@types/multer": "^1.4.11"
+  }
+}

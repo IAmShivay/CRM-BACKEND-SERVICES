@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: crm-qa
+
+resources:
+  - ../../base
+  - infisical.yaml
+
+images:
+  - name: REGISTRY/auth-service
+    newName: OCIR_REGION.ocir.io/TENANCY/crm/auth-service
+    newTag: qa
+  - name: REGISTRY/sales-service
+    newName: OCIR_REGION.ocir.io/TENANCY/crm/sales-service
+    newTag: qa
+  - name: REGISTRY/hr-service
+    newName: OCIR_REGION.ocir.io/TENANCY/crm/hr-service
+    newTag: qa
+  - name: REGISTRY/whatsapp-service
+    newName: OCIR_REGION.ocir.io/TENANCY/crm/whatsapp-service
+    newTag: qa
+  - name: REGISTRY/social-service
+    newName: OCIR_REGION.ocir.io/TENANCY/crm/social-service
+    newTag: qa
+  - name: REGISTRY/billing-service
+    newName: OCIR_REGION.ocir.io/TENANCY/crm/billing-service
+    newTag: qa
+  - name: REGISTRY/marketing-service
+    newName: OCIR_REGION.ocir.io/TENANCY/crm/marketing-service
+    newTag: qa
+  - name: REGISTRY/collaboration-service
+    newName: OCIR_REGION.ocir.io/TENANCY/crm/collaboration-service
+    newTag: qa
+  - name: REGISTRY/analytics-service
+    newName: OCIR_REGION.ocir.io/TENANCY/crm/analytics-service
+    newTag: qa
+  - name: REGISTRY/cms-service
+    newName: OCIR_REGION.ocir.io/TENANCY/crm/cms-service
+    newTag: qa
+  - name: REGISTRY/frontend
+    newName: OCIR_REGION.ocir.io/TENANCY/crm/frontend
+    newTag: qa

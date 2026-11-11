@@ -1,0 +1,180 @@
+name: Build & Deploy to OKE
+
+on:
+  push:
+    branches:
+      - develop
+      - qa
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy"
+        required: true
+        type: choice
+        options:
+          - dev
+          - qa
+          - prod
+
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  OCI_REGION: ${{ vars.OCI_REGION }}
+  OCIR_REGISTRY: ${{ vars.OCI_REGION }}.ocir.io
+  OCIR_NAMESPACE: ${{ vars.OCIR_NAMESPACE }}
+  OKE_CLUSTER_ID: ${{ vars.OKE_CLUSTER_ID }}
+
+jobs:
+  resolve-env:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+      k8s_namespace: ${{ steps.env.outputs.k8s_namespace }}
+      image_tag: ${{ steps.env.outputs.image_tag }}
+    steps:
+      - id: env
+        run: |
+          if [ "${{ github.event.inputs.environment }}" != "" ]; then
+            ENV="${{ github.event.inputs.environment }}"
+          elif [ "${{ github.ref_name }}" = "main" ]; then
+            ENV="prod"
+          elif [ "${{ github.ref_name }}" = "qa" ]; then
+            ENV="qa"
+          else
+            ENV="dev"
+          fi
+          echo "environment=${ENV}" >> $GITHUB_OUTPUT
+          echo "k8s_namespace=crm-${ENV}" >> $GITHUB_OUTPUT
+          echo "image_tag=${ENV}-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+  build-push:
+    needs: resolve-env
+    runs-on: ubuntu-latest
+    environment: ${{ needs.resolve-env.outputs.environment }}
+    strategy:
+      matrix:
+        service:
+          - auth-service
+          - sales-service
+          - hr-service
+          - whatsapp-service
+          - social-service
+          - billing-service
+          - marketing-service
+          - collaboration-service
+          - analytics-service
+          - cms-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up QEMU for ARM64
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Login to OCIR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.OCIR_REGISTRY }}
+          username: ${{ vars.OCIR_NAMESPACE }}/${{ secrets.OCI_USER }}
+          password: ${{ secrets.OCI_AUTH_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/arm64
+          push: true
+          build-args: |
+            SERVICE_PACKAGE=@crm-platform/${{ matrix.service }}
+            SERVICE_NAME=${{ matrix.service }}
+            SERVICE_PORT=${{ matrix.service == 'auth-service' && '8001' || matrix.service == 'sales-service' && '8002' || matrix.service == 'hr-service' && '8003' || matrix.service == 'whatsapp-service' && '8004' || matrix.service == 'social-service' && '8005' || matrix.service == 'billing-service' && '8006' || matrix.service == 'marketing-service' && '8007' || matrix.service == 'collaboration-service' && '8008' || matrix.service == 'analytics-service' && '8009' || '8010' }}
+          tags: |
+            ${{ env.OCIR_REGISTRY }}/${{ vars.OCIR_NAMESPACE }}/crm/${{ matrix.service }}:${{ needs.resolve-env.outputs.image_tag }}
+            ${{ env.OCIR_REGISTRY }}/${{ vars.OCIR_NAMESPACE }}/crm/${{ matrix.service }}:${{ needs.resolve-env.outputs.environment }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+  deploy:
+    needs: [resolve-env, build-push]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.resolve-env.outputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure OCI CLI
+        uses: oracle-actions/configure-kubectl-oke@v1.5.1
+        with:
+          cluster: ${{ env.OKE_CLUSTER_ID }}
+          region: ${{ env.OCI_REGION }}
+        env:
+          OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+          OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+          OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+          OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+          OCI_CLI_REGION: ${{ env.OCI_REGION }}
+
+      - name: Create namespace
+        run: |
+          kubectl create namespace ${{ needs.resolve-env.outputs.k8s_namespace }} --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create OCIR pull secret
+        run: |
+          kubectl create secret docker-registry ocir-secret \
+            --namespace=${{ needs.resolve-env.outputs.k8s_namespace }} \
+            --docker-server=${{ env.OCIR_REGISTRY }} \
+            --docker-username="${{ vars.OCIR_NAMESPACE }}/${{ secrets.OCI_USER }}" \
+            --docker-password="${{ secrets.OCI_AUTH_TOKEN }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create Infisical machine identity secret
+        run: |
+          kubectl create secret generic infisical-universal-auth \
+            --namespace=${{ needs.resolve-env.outputs.k8s_namespace }} \
+            --from-literal=clientId="${{ secrets.INFISICAL_CLIENT_ID }}" \
+            --from-literal=clientSecret="${{ secrets.INFISICAL_CLIENT_SECRET }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy with Kustomize
+        run: |
+          ENV=${{ needs.resolve-env.outputs.environment }}
+          TAG=${{ needs.resolve-env.outputs.image_tag }}
+          REGISTRY=${{ env.OCIR_REGISTRY }}/${{ vars.OCIR_NAMESPACE }}/crm
+
+          cd k8s/overlays/${ENV}
+
+          sed -i "s|OCIR_REGION.ocir.io/TENANCY/crm|${REGISTRY}|g" kustomization.yaml
+          sed -i "s|newTag: ${ENV}|newTag: ${TAG}|g" kustomization.yaml
+          sed -i "s|INFISICAL_HOST|${{ vars.INFISICAL_HOST || 'https://app.infisical.com/api' }}|; s|INFISICAL_PROJECT_SLUG|${{ vars.INFISICAL_PROJECT_SLUG }}|" infisical.yaml
+          sed -i "s|APP_ORIGIN|${{ vars.APP_ORIGIN }}|g" ../../base/ingress.yaml
+
+          kubectl apply -k .
+
+      - name: Wait for rollout
+        run: |
+          NS=${{ needs.resolve-env.outputs.k8s_namespace }}
+          FAILED=0
+          for SVC in auth-service sales-service hr-service whatsapp-service social-service billing-service marketing-service collaboration-service analytics-service cms-service; do
+            echo "Waiting for ${SVC}..."
+            kubectl rollout status deployment/${SVC} -n ${NS} --timeout=180s || FAILED=1
+          done
+          kubectl rollout status deployment/frontend -n ${NS} --timeout=180s || echo "frontend not deployed yet (CRM-SASS deploy-oke publishes it)"
+          exit ${FAILED}
+        env:
+          ENV: ${{ needs.resolve-env.outputs.environment }}
+
+      - name: Verify health
+        run: |
+          NS=${{ needs.resolve-env.outputs.k8s_namespace }}
+          kubectl get pods -n ${NS}
+          echo "---"
+          kubectl get svc -n ${NS}
+          echo "---"
+          kubectl get ingress -n ${NS}

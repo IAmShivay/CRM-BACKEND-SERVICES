@@ -1,0 +1,659 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: crm-platform
+  labels:
+    app: auth-service
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: auth-service
+          image: REGISTRY/auth-service:latest
+          ports:
+            - containerPort: 8001
+          envFrom:
+            - secretRef:
+                name: crm-env
+          env:
+            - name: PORT
+              value: "8001"
+            - name: SERVICE_NAME
+              value: "auth-service"
+          resources:
+            requests:
+              memory: "96Mi"
+              cpu: "50m"
+            limits:
+              memory: "192Mi"
+              cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8001
+            initialDelaySeconds: 20
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: crm-platform
+spec:
+  selector:
+    app: auth-service
+  ports:
+    - port: 8001
+      targetPort: 8001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sales-service
+  namespace: crm-platform
+  labels:
+    app: sales-service
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sales-service
+  template:
+    metadata:
+      labels:
+        app: sales-service
+    spec:
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: sales-service
+          image: REGISTRY/sales-service:latest
+          ports:
+            - containerPort: 8002
+          envFrom:
+            - secretRef:
+                name: crm-env
+          env:
+            - name: PORT
+              value: "8002"
+            - name: SERVICE_NAME
+              value: "sales-service"
+          resources:
+            requests:
+              memory: "96Mi"
+              cpu: "50m"
+            limits:
+              memory: "192Mi"
+              cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8002
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8002
+            initialDelaySeconds: 20
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sales-service
+  namespace: crm-platform
+spec:
+  selector:
+    app: sales-service
+  ports:
+    - port: 8002
+      targetPort: 8002
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hr-service
+  namespace: crm-platform
+  labels:
+    app: hr-service
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hr-service
+  template:
+    metadata:
+      labels:
+        app: hr-service
+    spec:
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: hr-service
+          image: REGISTRY/hr-service:latest
+          ports:
+            - containerPort: 8003
+          envFrom:
+            - secretRef:
+                name: crm-env
+          env:
+            - name: PORT
+              value: "8003"
+            - name: SERVICE_NAME
+              value: "hr-service"
+          resources:
+            requests:
+              memory: "96Mi"
+              cpu: "50m"
+            limits:
+              memory: "192Mi"
+              cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8003
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8003
+            initialDelaySeconds: 20
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hr-service
+  namespace: crm-platform
+spec:
+  selector:
+    app: hr-service
+  ports:
+    - port: 8003
+      targetPort: 8003
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whatsapp-service
+  namespace: crm-platform
+  labels:
+    app: whatsapp-service
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whatsapp-service
+  template:
+    metadata:
+      labels:
+        app: whatsapp-service
+    spec:
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: whatsapp-service
+          image: REGISTRY/whatsapp-service:latest
+          ports:
+            - containerPort: 8004
+          envFrom:
+            - secretRef:
+                name: crm-env
+          env:
+            - name: PORT
+              value: "8004"
+            - name: SERVICE_NAME
+              value: "whatsapp-service"
+          resources:
+            requests:
+              memory: "96Mi"
+              cpu: "50m"
+            limits:
+              memory: "192Mi"
+              cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8004
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8004
+            initialDelaySeconds: 20
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whatsapp-service
+  namespace: crm-platform
+spec:
+  selector:
+    app: whatsapp-service
+  ports:
+    - port: 8004
+      targetPort: 8004
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: social-service
+  namespace: crm-platform
+  labels:
+    app: social-service
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: social-service
+  template:
+    metadata:
+      labels:
+        app: social-service
+    spec:
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: social-service
+          image: REGISTRY/social-service:latest
+          ports:
+            - containerPort: 8005
+          envFrom:
+            - secretRef:
+                name: crm-env
+          env:
+            - name: PORT
+              value: "8005"
+            - name: SERVICE_NAME
+              value: "social-service"
+          resources:
+            requests:
+              memory: "96Mi"
+              cpu: "50m"
+            limits:
+              memory: "192Mi"
+              cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8005
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8005
+            initialDelaySeconds: 20
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: social-service
+  namespace: crm-platform
+spec:
+  selector:
+    app: social-service
+  ports:
+    - port: 8005
+      targetPort: 8005
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: billing-service
+  namespace: crm-platform
+  labels:
+    app: billing-service
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: billing-service
+  template:
+    metadata:
+      labels:
+        app: billing-service
+    spec:
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: billing-service
+          image: REGISTRY/billing-service:latest
+          ports:
+            - containerPort: 8006
+          envFrom:
+            - secretRef:
+                name: crm-env
+          env:
+            - name: PORT
+              value: "8006"
+            - name: SERVICE_NAME
+              value: "billing-service"
+          resources:
+            requests:
+              memory: "96Mi"
+              cpu: "50m"
+            limits:
+              memory: "192Mi"
+              cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8006
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8006
+            initialDelaySeconds: 20
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-service
+  namespace: crm-platform
+spec:
+  selector:
+    app: billing-service
+  ports:
+    - port: 8006
+      targetPort: 8006
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marketing-service
+  namespace: crm-platform
+  labels:
+    app: marketing-service
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: marketing-service
+  template:
+    metadata:
+      labels:
+        app: marketing-service
+    spec:
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: marketing-service
+          image: REGISTRY/marketing-service:latest
+          ports:
+            - containerPort: 8007
+          envFrom:
+            - secretRef:
+                name: crm-env
+          env:
+            - name: PORT
+              value: "8007"
+            - name: SERVICE_NAME
+              value: "marketing-service"
+          resources:
+            requests:
+              memory: "96Mi"
+              cpu: "50m"
+            limits:
+              memory: "192Mi"
+              cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8007
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8007
+            initialDelaySeconds: 20
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: marketing-service
+  namespace: crm-platform
+spec:
+  selector:
+    app: marketing-service
+  ports:
+    - port: 8007
+      targetPort: 8007
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: collaboration-service
+  namespace: crm-platform
+  labels:
+    app: collaboration-service
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: collaboration-service
+  template:
+    metadata:
+      labels:
+        app: collaboration-service
+    spec:
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: collaboration-service
+          image: REGISTRY/collaboration-service:latest
+          ports:
+            - containerPort: 8008
+          envFrom:
+            - secretRef:
+                name: crm-env
+          env:
+            - name: PORT
+              value: "8008"
+            - name: SERVICE_NAME
+              value: "collaboration-service"
+          resources:
+            requests:
+              memory: "96Mi"
+              cpu: "50m"
+            limits:
+              memory: "192Mi"
+              cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8008
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8008
+            initialDelaySeconds: 20
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: collaboration-service
+  namespace: crm-platform
+spec:
+  selector:
+    app: collaboration-service
+  ports:
+    - port: 8008
+      targetPort: 8008
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-service
+  namespace: crm-platform
+  labels:
+    app: analytics-service
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analytics-service
+  template:
+    metadata:
+      labels:
+        app: analytics-service
+    spec:
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: analytics-service
+          image: REGISTRY/analytics-service:latest
+          ports:
+            - containerPort: 8009
+          envFrom:
+            - secretRef:
+                name: crm-env
+          env:
+            - name: PORT
+              value: "8009"
+            - name: SERVICE_NAME
+              value: "analytics-service"
+          resources:
+            requests:
+              memory: "96Mi"
+              cpu: "50m"
+            limits:
+              memory: "192Mi"
+              cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8009
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8009
+            initialDelaySeconds: 20
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-service
+  namespace: crm-platform
+spec:
+  selector:
+    app: analytics-service
+  ports:
+    - port: 8009
+      targetPort: 8009
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cms-service
+  namespace: crm-platform
+  labels:
+    app: cms-service
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cms-service
+  template:
+    metadata:
+      labels:
+        app: cms-service
+    spec:
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: cms-service
+          image: REGISTRY/cms-service:latest
+          ports:
+            - containerPort: 8010
+          envFrom:
+            - secretRef:
+                name: crm-env
+          env:
+            - name: PORT
+              value: "8010"
+            - name: SERVICE_NAME
+              value: "cms-service"
+          resources:
+            requests:
+              memory: "96Mi"
+              cpu: "50m"
+            limits:
+              memory: "192Mi"
+              cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8010
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8010
+            initialDelaySeconds: 20
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cms-service
+  namespace: crm-platform
+spec:
+  selector:
+    app: cms-service
+  ports:
+    - port: 8010
+      targetPort: 8010

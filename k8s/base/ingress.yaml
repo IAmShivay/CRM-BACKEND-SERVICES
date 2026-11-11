@@ -1,0 +1,446 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: crm-gateway
+  namespace: crm-platform
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "APP_ORIGIN"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type, Authorization, X-Correlation-Id, X-Workspace-Id"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8001
+          - path: /api/users
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8001
+          - path: /api/roles
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8001
+          - path: /api/workspaces
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8001
+          - path: /api/invites
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8001
+          - path: /api/onboarding
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8001
+          - path: /api/referrals
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8001
+          - path: /api/leads
+            pathType: Prefix
+            backend:
+              service:
+                name: sales-service
+                port:
+                  number: 8002
+          - path: /api/contacts
+            pathType: Prefix
+            backend:
+              service:
+                name: sales-service
+                port:
+                  number: 8002
+          - path: /api/deals
+            pathType: Prefix
+            backend:
+              service:
+                name: sales-service
+                port:
+                  number: 8002
+          - path: /api/pipelines
+            pathType: Prefix
+            backend:
+              service:
+                name: sales-service
+                port:
+                  number: 8002
+          - path: /api/lead-statuses
+            pathType: Prefix
+            backend:
+              service:
+                name: sales-service
+                port:
+                  number: 8002
+          - path: /api/tags
+            pathType: Prefix
+            backend:
+              service:
+                name: sales-service
+                port:
+                  number: 8002
+          - path: /api/activities
+            pathType: Prefix
+            backend:
+              service:
+                name: sales-service
+                port:
+                  number: 8002
+          - path: /api/appointments
+            pathType: Prefix
+            backend:
+              service:
+                name: sales-service
+                port:
+                  number: 8002
+          - path: /api/invoices
+            pathType: Prefix
+            backend:
+              service:
+                name: sales-service
+                port:
+                  number: 8002
+          - path: /api/quotations
+            pathType: Prefix
+            backend:
+              service:
+                name: sales-service
+                port:
+                  number: 8002
+          - path: /api/products
+            pathType: Prefix
+            backend:
+              service:
+                name: sales-service
+                port:
+                  number: 8002
+          - path: /api/hr
+            pathType: Prefix
+            backend:
+              service:
+                name: hr-service
+                port:
+                  number: 8003
+          - path: /api/employees
+            pathType: Prefix
+            backend:
+              service:
+                name: hr-service
+                port:
+                  number: 8003
+          - path: /api/attendance
+            pathType: Prefix
+            backend:
+              service:
+                name: hr-service
+                port:
+                  number: 8003
+          - path: /api/leaves
+            pathType: Prefix
+            backend:
+              service:
+                name: hr-service
+                port:
+                  number: 8003
+          - path: /api/shifts
+            pathType: Prefix
+            backend:
+              service:
+                name: hr-service
+                port:
+                  number: 8003
+          - path: /api/assets
+            pathType: Prefix
+            backend:
+              service:
+                name: hr-service
+                port:
+                  number: 8003
+          - path: /api/whatsapp
+            pathType: Prefix
+            backend:
+              service:
+                name: whatsapp-service
+                port:
+                  number: 8004
+          - path: /api/oauth
+            pathType: Prefix
+            backend:
+              service:
+                name: social-service
+                port:
+                  number: 8005
+          - path: /api/push
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/social
+            pathType: Prefix
+            backend:
+              service:
+                name: social-service
+                port:
+                  number: 8005
+          - path: /api/payments
+            pathType: Prefix
+            backend:
+              service:
+                name: billing-service
+                port:
+                  number: 8006
+          - path: /api/plans
+            pathType: Prefix
+            backend:
+              service:
+                name: billing-service
+                port:
+                  number: 8006
+          - path: /api/campaigns
+            pathType: Prefix
+            backend:
+              service:
+                name: marketing-service
+                port:
+                  number: 8007
+          - path: /api/email-sequences
+            pathType: Prefix
+            backend:
+              service:
+                name: marketing-service
+                port:
+                  number: 8007
+          - path: /api/sms
+            pathType: Prefix
+            backend:
+              service:
+                name: marketing-service
+                port:
+                  number: 8007
+          - path: /api/email
+            pathType: Prefix
+            backend:
+              service:
+                name: marketing-service
+                port:
+                  number: 8007
+          - path: /api/engines
+            pathType: Prefix
+            backend:
+              service:
+                name: marketing-service
+                port:
+                  number: 8007
+          - path: /api/webhooks/cashfree
+            pathType: Prefix
+            backend:
+              service:
+                name: billing-service
+                port:
+                  number: 8006
+          - path: /api/webhooks
+            pathType: Prefix
+            backend:
+              service:
+                name: marketing-service
+                port:
+                  number: 8007
+          - path: /api/ai
+            pathType: Prefix
+            backend:
+              service:
+                name: marketing-service
+                port:
+                  number: 8007
+          - path: /api/cron
+            pathType: Prefix
+            backend:
+              service:
+                name: marketing-service
+                port:
+                  number: 8007
+          - path: /api/chat
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/projects
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/tasks
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/sprints
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/columns
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/meetings
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/documents
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/notifications
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/calendar
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/comments
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/calls
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008
+          - path: /api/analytics
+            pathType: Prefix
+            backend:
+              service:
+                name: analytics-service
+                port:
+                  number: 8009
+          - path: /api/metrics
+            pathType: Prefix
+            backend:
+              service:
+                name: analytics-service
+                port:
+                  number: 8009
+          - path: /api/blogs
+            pathType: Prefix
+            backend:
+              service:
+                name: cms-service
+                port:
+                  number: 8010
+          - path: /api/fmcg
+            pathType: Prefix
+            backend:
+              service:
+                name: cms-service
+                port:
+                  number: 8010
+          - path: /api/compliance
+            pathType: Prefix
+            backend:
+              service:
+                name: cms-service
+                port:
+                  number: 8010
+          - path: /api/health
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8001
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 3000
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: crm-gateway-socket
+  namespace: crm-platform
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "APP_ORIGIN"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type, Authorization, X-Correlation-Id, X-Workspace-Id"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api/socket
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration-service
+                port:
+                  number: 8008

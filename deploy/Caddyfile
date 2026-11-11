@@ -1,0 +1,11 @@
+{$DOMAIN} {
+	encode gzip
+
+	handle /api/* {
+		reverse_proxy gateway:80
+	}
+
+	handle {
+		reverse_proxy frontend:3000
+	}
+}

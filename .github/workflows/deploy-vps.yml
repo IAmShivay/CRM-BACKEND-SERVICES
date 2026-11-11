@@ -1,0 +1,175 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - develop
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+concurrency:
+  group: deploy-vps-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  resolve-env:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+      image_prefix: ${{ steps.env.outputs.image_prefix }}
+    steps:
+      - id: env
+        run: |
+          if [ -n "${{ github.event.inputs.environment }}" ]; then
+            ENV="${{ github.event.inputs.environment }}"
+          elif [ "${{ github.ref_name }}" = "main" ]; then
+            ENV=prod
+          elif [ "${{ github.ref_name }}" = "staging" ]; then
+            ENV=staging
+          else
+            ENV=dev
+          fi
+          echo "environment=${ENV}" >> $GITHUB_OUTPUT
+          echo "image_prefix=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+
+  build:
+    needs: resolve-env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+
+  build-push:
+    needs: [resolve-env, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        service:
+          - auth-service
+          - sales-service
+          - hr-service
+          - whatsapp-service
+          - social-service
+          - billing-service
+          - marketing-service
+          - collaboration-service
+          - analytics-service
+          - cms-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          build-args: |
+            SERVICE_PACKAGE=@crm-platform/${{ matrix.service }}
+            SERVICE_NAME=${{ matrix.service }}
+            SERVICE_PORT=${{ matrix.service == 'auth-service' && '8001' || matrix.service == 'sales-service' && '8002' || matrix.service == 'hr-service' && '8003' || matrix.service == 'whatsapp-service' && '8004' || matrix.service == 'social-service' && '8005' || matrix.service == 'billing-service' && '8006' || matrix.service == 'marketing-service' && '8007' || matrix.service == 'collaboration-service' && '8008' || matrix.service == 'analytics-service' && '8009' || '8010' }}
+          tags: |
+            ${{ needs.resolve-env.outputs.image_prefix }}/crm-${{ matrix.service }}:${{ github.sha }}
+            ${{ needs.resolve-env.outputs.image_prefix }}/crm-${{ matrix.service }}:${{ needs.resolve-env.outputs.environment }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+  deploy:
+    needs: [resolve-env, build-push]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.resolve-env.outputs.environment }}
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write deploy config
+        run: |
+          cat > deploy.env <<EOF
+          IMAGE_PREFIX=${{ needs.resolve-env.outputs.image_prefix }}
+          TAG=${{ github.sha }}
+          GATEWAY_PORT=${{ vars.GATEWAY_PORT || '8000' }}
+          FRONTEND_PORT=${{ vars.FRONTEND_PORT || '3000' }}
+          FRONTEND_IMAGE_PREFIX=${{ needs.resolve-env.outputs.image_prefix }}
+          DOMAIN=${{ vars.DOMAIN }}
+          APP_PUBLIC_URL=${{ vars.APP_PUBLIC_URL || format('https://{0}', vars.DOMAIN) }}
+          CORS_ORIGIN_REGEX=${{ vars.CORS_ORIGIN_REGEX || format('https://{0}', vars.DOMAIN) }}
+          COMPOSE_PROFILES=${{ vars.COMPOSE_PROFILES || 'tls' }}
+          EOF
+          cat > infisical.conf <<EOF
+          INFISICAL_CLIENT_ID=${{ secrets.INFISICAL_CLIENT_ID }}
+          INFISICAL_CLIENT_SECRET=${{ secrets.INFISICAL_CLIENT_SECRET }}
+          INFISICAL_PROJECT_ID=${{ vars.INFISICAL_PROJECT_ID }}
+          INFISICAL_ENV=${{ needs.resolve-env.outputs.environment }}
+          INFISICAL_HOST=${{ vars.INFISICAL_HOST || 'https://app.infisical.com/api' }}
+          EOF
+
+      - name: Copy deploy files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "docker-compose.prod.yml,apps/gateway/nginx.conf,deploy/infisical-sync.sh,deploy/Caddyfile,deploy.env,infisical.conf"
+          target: /opt/crm-platform/${{ needs.resolve-env.outputs.environment }}/incoming
+          overwrite: true
+
+      - name: Deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            DIR=/opt/crm-platform/${{ needs.resolve-env.outputs.environment }}
+            cd "$DIR"
+            mv incoming/docker-compose.prod.yml docker-compose.yml
+            mv incoming/apps/gateway/nginx.conf nginx.conf
+            mv incoming/deploy/infisical-sync.sh infisical-sync.sh
+            mv incoming/deploy/Caddyfile Caddyfile
+            if [ -f deploy.env ]; then
+              FRONTEND_TAG=$(grep -E '^FRONTEND_TAG=' deploy.env | cut -d= -f2-)
+            fi
+            mv incoming/deploy.env deploy.env
+            echo "FRONTEND_TAG=${FRONTEND_TAG:-${{ needs.resolve-env.outputs.environment }}}" >> deploy.env
+            mv incoming/infisical.conf infisical.conf
+            chmod 600 infisical.conf deploy.env
+            chmod 700 infisical-sync.sh
+            rm -rf incoming
+            rm -f .env
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+            docker compose --env-file deploy.env pull --ignore-pull-failures
+            ./infisical-sync.sh
+            docker compose up -d --remove-orphans
+            docker image prune -f
+            ( crontab -l 2>/dev/null | grep -v "$DIR/infisical-sync.sh" ; echo "*/5 * * * * $DIR/infisical-sync.sh >> $DIR/infisical-sync.log 2>&1" ) | crontab -
+            sleep 10
+            docker compose ps
+            wget -qO- http://localhost:${{ vars.GATEWAY_PORT || '8000' }}/api/health || (docker compose logs --tail=50 gateway; exit 1)

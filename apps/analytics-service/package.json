@@ -1,0 +1,35 @@
+{
+  "name": "@crm-platform/analytics-service",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
+  },
+  "dependencies": {
+    "express": "^4.19.0",
+    "mongoose": "^8.4.0",
+    "zod": "^3.23.0",
+    "winston": "^3.13.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "cors": "^2.8.5",
+    "cookie-parser": "^1.4.6",
+    "helmet": "^7.1.0",
+    "@crm-platform/shared-types": "file:../../packages/shared-types",
+    "@crm-platform/logger": "file:../../packages/logger",
+    "@crm-platform/auth-middleware": "file:../../packages/auth-middleware",
+    "@crm-platform/db": "file:../../packages/db",
+    "dotenv": "^18.0.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.6",
+    "@types/cors": "^2.8.17",
+    "@types/cookie-parser": "^1.4.7",
+    "@types/node": "^20.12.0",
+    "typescript": "^5.4.0",
+    "ts-node-dev": "^2.0.0"
+  }
+}

@@ -1,0 +1,247 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PACKAGE: "@crm-platform/auth-service"
+        SERVICE_NAME: auth-service
+        SERVICE_PORT: 8001
+    ports:
+      - "8001:8001"
+    env_file: .env
+    environment:
+      - SERVICE_NAME=auth-service
+      - PORT=8001
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  sales-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PACKAGE: "@crm-platform/sales-service"
+        SERVICE_NAME: sales-service
+        SERVICE_PORT: 8002
+    ports:
+      - "8002:8002"
+    env_file: .env
+    environment:
+      - SERVICE_NAME=sales-service
+      - PORT=8002
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  hr-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PACKAGE: "@crm-platform/hr-service"
+        SERVICE_NAME: hr-service
+        SERVICE_PORT: 8003
+    ports:
+      - "8003:8003"
+    env_file: .env
+    environment:
+      - SERVICE_NAME=hr-service
+      - PORT=8003
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  whatsapp-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PACKAGE: "@crm-platform/whatsapp-service"
+        SERVICE_NAME: whatsapp-service
+        SERVICE_PORT: 8004
+    ports:
+      - "8004:8004"
+    env_file: .env
+    environment:
+      - SERVICE_NAME=whatsapp-service
+      - PORT=8004
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  social-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PACKAGE: "@crm-platform/social-service"
+        SERVICE_NAME: social-service
+        SERVICE_PORT: 8005
+    ports:
+      - "8005:8005"
+    env_file: .env
+    environment:
+      - SERVICE_NAME=social-service
+      - PORT=8005
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  billing-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PACKAGE: "@crm-platform/billing-service"
+        SERVICE_NAME: billing-service
+        SERVICE_PORT: 8006
+    ports:
+      - "8006:8006"
+    env_file: .env
+    environment:
+      - SERVICE_NAME=billing-service
+      - PORT=8006
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  marketing-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PACKAGE: "@crm-platform/marketing-service"
+        SERVICE_NAME: marketing-service
+        SERVICE_PORT: 8007
+    ports:
+      - "8007:8007"
+    env_file: .env
+    environment:
+      - SERVICE_NAME=marketing-service
+      - PORT=8007
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  collaboration-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PACKAGE: "@crm-platform/collaboration-service"
+        SERVICE_NAME: collaboration-service
+        SERVICE_PORT: 8008
+    ports:
+      - "8008:8008"
+    env_file: .env
+    environment:
+      - SERVICE_NAME=collaboration-service
+      - PORT=8008
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PACKAGE: "@crm-platform/analytics-service"
+        SERVICE_NAME: analytics-service
+        SERVICE_PORT: 8009
+    ports:
+      - "8009:8009"
+    env_file: .env
+    environment:
+      - SERVICE_NAME=analytics-service
+      - PORT=8009
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  cms-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PACKAGE: "@crm-platform/cms-service"
+        SERVICE_NAME: cms-service
+        SERVICE_PORT: 8010
+    ports:
+      - "8010:8010"
+    env_file: .env
+    environment:
+      - SERVICE_NAME=cms-service
+      - PORT=8010
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-admin123}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+
+  gateway:
+    image: nginx:alpine
+    ports:
+      - "8000:80"
+    environment:
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+      - NGINX_ENVSUBST_FILTER=^CORS_ORIGIN_REGEX$$
+      - CORS_ORIGIN_REGEX=${CORS_ORIGIN_REGEX:-https?://localhost:300[01]}
+    volumes:
+      - ./apps/gateway/nginx.conf:/etc/nginx/templates/nginx.conf.template:ro
+    depends_on:
+      - auth-service
+      - sales-service
+      - hr-service
+      - whatsapp-service
+      - social-service
+      - billing-service
+      - marketing-service
+      - collaboration-service
+      - analytics-service
+      - cms-service
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  redis_data:
+  n8n_data:
